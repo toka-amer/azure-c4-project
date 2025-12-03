@@ -10,7 +10,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPLogExporter
+#from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPLogExporter
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 
 
@@ -21,21 +21,12 @@ from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 INSTRUMENTATION_KEY = "a431fe34-2ddd-42e5-985d-b4639d1258ac"
 
 # ---- Logging ----
-logger_provider = LoggerProvider(
-    resource=Resource.create({SERVICE_NAME: "flask-vote-app"})
-)
-logger_processor = BatchLogRecordProcessor(
-    OTLPLogExporter(
-        endpoint="https://dc.services.visualstudio.com/v2/track",
-        headers={"x-api-key": INSTRUMENTATION_KEY},
-    )
-)
-logger_provider.add_log_record_processor(logger_processor)
-
+logger_provider = LoggerProvider(resource=Resource.create({SERVICE_NAME: "flask-vote-app"}))
 handler = LoggingHandler(logger_provider=logger_provider)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(handler)
+
 
 # ---- Tracing ----
 trace_provider = TracerProvider(

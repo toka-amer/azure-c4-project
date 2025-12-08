@@ -10,9 +10,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-#from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPLogExporter
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
-
 
 # ==============================
 #  CONFIGURE APP INSIGHTS
@@ -27,7 +25,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
-
 # ---- Tracing ----
 trace_provider = TracerProvider(
     resource=Resource.create({SERVICE_NAME: "flask-vote-app"})
@@ -41,7 +38,6 @@ span_processor = BatchSpanProcessor(
 trace_provider.add_span_processor(span_processor)
 trace.set_tracer_provider(trace_provider)
 tracer = trace.get_tracer(__name__)
-
 
 # ==============================
 #       FLASK APP
@@ -61,7 +57,7 @@ title = os.getenv("TITLE", app.config["TITLE"])
 r = redis.Redis()
 
 # Change title to host if needed
-if app.config["SHOWHOST"] == "true":
+if app.config.get("SHOWHOST") == "true":
     title = socket.gethostname()
 
 # Initialize redis values
@@ -70,23 +66,21 @@ if not r.get(button1):
 if not r.get(button2):
     r.set(button2, 0)
 
-
 # ==============================
 #       ROUTES
 # ==============================
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # TEST SPAN for App Insights
+    with tracer.start_as_current_span("test-span"):
+        logger.info("Test span sent to App Insights", extra={"custom_dimensions": {"event": "test"}})
 
     if request.method == "GET":
-
         vote1 = r.get(button1).decode("utf-8")
         vote2 = r.get(button2).decode("utf-8")
-
-        # Trace GET votes
         with tracer.start_as_current_span("GET votes"):
             pass
-
         return render_template(
             "index.html",
             value1=int(vote1),
@@ -98,17 +92,12 @@ def index():
 
     # POST
     if request.method == "POST":
-
         if request.form["vote"] == "reset":
             r.set(button1, 0)
             r.set(button2, 0)
-
             vote1 = r.get(button1).decode("utf-8")
             vote2 = r.get(button2).decode("utf-8")
-
-            # Log reset event
             logger.info("Votes reset", extra={"custom_dimensions": {"vote1": vote1, "vote2": vote2}})
-
             return render_template(
                 "index.html",
                 value1=int(vote1),
@@ -118,20 +107,13 @@ def index():
                 title=title,
             )
 
-        # Normal voting
         vote = request.form["vote"]
         r.incr(vote, 1)
-
         vote1 = r.get(button1).decode("utf-8")
         vote2 = r.get(button2).decode("utf-8")
-
-        # Log vote
         logger.info("Vote submitted", extra={"custom_dimensions": {"vote": vote}})
-
-        # Trace POST vote
         with tracer.start_as_current_span("POST vote"):
             pass
-
         return render_template(
             "index.html",
             value1=int(vote1),
@@ -141,14 +123,10 @@ def index():
             title=title,
         )
 
-
 # ==============================
 #       START APP
 # ==============================
 
 if __name__ == "__main__":
-    # LOCAL
-    #app.run()
-
-    # BEFORE DEPLOYING
+    # Run Flask app on all interfaces
     app.run(host="0.0.0.0", threaded=True, debug=True)

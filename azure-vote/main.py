@@ -18,7 +18,7 @@ from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 #  CONFIGURE APP INSIGHTS
 # ==============================
 
-INSTRUMENTATION_KEY = "a431fe34-2ddd-42e5-985d-b4639d1258ac"
+INSTRUMENTATION_KEY = "2b2cb4e4-f81d-4d2c-b5b7-3e6a8644bc16"
 
 # ---- Logging ----
 logger_provider = LoggerProvider(resource=Resource.create({SERVICE_NAME: "flask-vote-app"}))

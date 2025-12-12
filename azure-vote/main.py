@@ -177,11 +177,13 @@ def index():
             # Get current values
             vote1 = r.get(button1).decode("utf-8")
             properties = {"custom_dimensions": {"Cats Vote": vote1}}
-            
+            # TODO: use logger object to log cat vote
+            logger.info("Cats Vote", extra=properties)
 
             vote2 = r.get(button2).decode("utf-8")
             properties = {"custom_dimensions": {"Dogs Vote": vote2}}
-            
+            # TODO: use logger object to log dog vote
+            logger.info("Dogs Vote", extra=properties)            
 
             # Return results
             return render_template(

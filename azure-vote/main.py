@@ -31,24 +31,24 @@ config_integration.trace_integrations(['logging'])
 config_integration.trace_integrations(['requests'])
 # Standard Logging
 logger = logging.getLogger(__name__)
-handler = AzureLogHandler(connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e')
+handler = AzureLogHandler(connection_string='InstrumentationKey=580bfce3-c6d7-4316-986f-7a1da8257a54')
 handler.setFormatter(logging.Formatter('%(traceId)s %(spanId)s %(message)s'))
 logger.addHandler(handler)
 # Logging custom Events 
-logger.addHandler(AzureEventHandler(connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e'))
+logger.addHandler(AzureEventHandler(connection_string='InstrumentationKey=580bfce3-c6d7-4316-986f-7a1da8257a54'))
 # Set the logging level
 logger.setLevel(logging.INFO)
 
 # Metrics
 exporter = metrics_exporter.new_metrics_exporter(
 enable_standard_metrics=True,
-connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e')
+connection_string='InstrumentationKey=580bfce3-c6d7-4316-986f-7a1da8257a54')
 view_manager.register_exporter(exporter)
 
 # Tracing
 tracer = Tracer(
 exporter=AzureExporter(
-  connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e'),
+  connection_string='InstrumentationKey=580bfce3-c6d7-4316-986f-7a1da8257a54'),
 sampler=ProbabilitySampler(1.0),
 )
 app = Flask(__name__)
@@ -57,7 +57,7 @@ app = Flask(__name__)
 middleware = FlaskMiddleware(
     app,
     exporter=AzureExporter(
-        connection_string="InstrumentationKey=dc8cb0f2-62bc-4b6d-900e-a259522d5f05"
+        connection_string="InstrumentationKey=580bfce3-c6d7-4316-986f-7a1da8257a54"
     ),
     sampler=ProbabilitySampler(rate=1.0),
 )
@@ -191,5 +191,5 @@ if __name__ == "__main__":
     # comment line below when deploying to VMSS
     # app.run()  # local
     # uncomment the line below before deployment to VMSS
-    app.run(host="0.0.0.0", port=5000, threaded=True, debug=True)  # remote
+    app.run(host="0.0.0.0",threaded=True, debug=True)  # remote
     # app.run(host='0.0.0.0', threaded=True, debug=True, port=5000) # remote

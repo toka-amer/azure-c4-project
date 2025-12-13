@@ -10,63 +10,54 @@ from flask import Flask, render_template, request
 
 # App Insights
 # TODO: Import required libraries for App Insights
+from opencensus.ext.azure.log_exporter import AzureLogHandler
+from opencensus.ext.azure.log_exporter import AzureEventHandler
 from opencensus.ext.azure import metrics_exporter
-from opencensus.ext.azure.log_exporter import AzureEventHandler, AzureLogHandler
-from opencensus.ext.azure.trace_exporter import AzureExporter
-from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 from opencensus.stats import aggregation as aggregation_module
 from opencensus.stats import measure as measure_module
 from opencensus.stats import stats as stats_module
 from opencensus.stats import view as view_module
 from opencensus.tags import tag_map as tag_map_module
 from opencensus.trace import config_integration
+from opencensus.ext.azure.trace_exporter import AzureExporter
 from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.tracer import Tracer
-
+from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 # For metrics
 stats = stats_module.stats
 view_manager = stats.view_manager
-config_integration.trace_integrations(["logging"])
-config_integration.trace_integrations(["requests"])
 
-# Logging
+config_integration.trace_integrations(['logging'])
+config_integration.trace_integrations(['requests'])
+# Standard Logging
 logger = logging.getLogger(__name__)
-handler = AzureLogHandler(
-    connection_string="InstrumentationKey=e91d2467-efac-41b3-9057-b0722c66f96c"
-)
-handler.setFormatter(logging.Formatter("%(traceId)s %(spanId)s %(message)s"))
+handler = AzureLogHandler(connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e')
+handler.setFormatter(logging.Formatter('%(traceId)s %(spanId)s %(message)s'))
 logger.addHandler(handler)
-# Logging custom Events
-logger.addHandler(
-    AzureEventHandler(
-        connection_string="InstrumentationKey=e91d2467-efac-41b3-9057-b0722c66f96c"
-    )
-)
+# Logging custom Events 
+logger.addHandler(AzureEventHandler(connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e'))
 # Set the logging level
 logger.setLevel(logging.INFO)
 
 # Metrics
 exporter = metrics_exporter.new_metrics_exporter(
-    enable_standard_metrics=True,
-    connection_string="InstrumentationKey=e91d2467-efac-41b3-9057-b0722c66f96c",
-)
+enable_standard_metrics=True,
+connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e')
 view_manager.register_exporter(exporter)
 
 # Tracing
 tracer = Tracer(
-    exporter=AzureExporter(
-        connection_string="InstrumentationKey=e91d2467-efac-41b3-9057-b0722c66f96c"
-    ),
-    sampler=ProbabilitySampler(1.0),
+exporter=AzureExporter(
+  connection_string='InstrumentationKey=f8cedc02-b861-49f8-a235-241441e7d96e'),
+sampler=ProbabilitySampler(1.0),
 )
-
 app = Flask(__name__)
 
 # Requests
 middleware = FlaskMiddleware(
     app,
     exporter=AzureExporter(
-        connection_string="InstrumentationKey=e91d2467-efac-41b3-9057-b0722c66f96c"
+        connection_string="InstrumentationKey=dc8cb0f2-62bc-4b6d-900e-a259522d5f05"
     ),
     sampler=ProbabilitySampler(rate=1.0),
 )

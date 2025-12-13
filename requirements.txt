@@ -5,3 +5,8 @@ opentelemetry-sdk
 opentelemetry-instrumentation
 opentelemetry-instrumentation-flask
 opentelemetry-exporter-otlp
+Werkzeug==2.3.7
+opencensus-ext-azure==1.1.13
+opencensus-ext-flask==0.8.1
+opencensus==0.11.4
+opencensus-ext-logging==0.1.1
